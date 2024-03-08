@@ -1,13 +1,13 @@
-import { useD3 } from "../useD3";
+import { useD3 } from "../../hooks/useD3";
 
 // import {Swatches} from "d3/color-legend"
 // import {howto, altplot} from "d3/example-components"
 import React, { useContext, useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
-import { useContainerSize } from "../useContainerSize";
-import { MyContext } from "../data_context";
+import { useContainerSize } from "../../hooks/useContainerSize";
+import { MyContext } from "../../contexts/data_context";
 
-function Streamgraph(
+ const Streamgraph = (
   data,
   {
     x = ([x]) => x, // given d in data, returns the (ordinal) x-value
@@ -34,7 +34,7 @@ function Streamgraph(
     colors = d3.schemeTableau10,
     svg,
   } = {}
-) {
+) => {
   // Compute values.
   const X = d3.map(data, x);
   const Y = d3.map(data, y);
@@ -124,7 +124,7 @@ function Streamgraph(
   return Object.assign(svg.node(), { scales: { color } });
 }
 
-function Explore2() {
+export const Explore2 = () => {
   const containerRef = useRef(null);
   const { width, height } = useContainerSize(containerRef);
 
@@ -221,4 +221,4 @@ function Explore2() {
   );
 }
 
-export default Explore2;
+
