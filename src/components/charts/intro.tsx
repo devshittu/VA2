@@ -5,7 +5,7 @@ const top_stats = [
   { name: "Number of Columns", stat: "53" },
 ];
 
-function Intro() {
+export const Intro = () =>{
   return (
     <div className="w-full">
       Welcome to our dashboard.
@@ -35,4 +35,3 @@ function Intro() {
   );
 }
 
-export default Intro;
