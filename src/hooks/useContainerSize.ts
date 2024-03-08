@@ -1,7 +1,14 @@
-import { useEffect, useState } from "react";
 
-export function useContainerSize(ref) {
-  const [size, setSize] = useState({ width: 0, height: 0 });
+import { useEffect, useState, RefObject } from "react";
+
+type Size = {
+  width: number;
+  height: number;
+};
+
+// Use a generic type T that extends HTMLElement to ensure the ref can be any kind of DOM element
+export const useContainerSize = <T extends HTMLElement>(ref: RefObject<T>): Size => {
+  const [size, setSize] = useState<Size>({ width: 0, height: 0 });
 
   useEffect(() => {
     const resizeObserver = new ResizeObserver((entries) => {
@@ -33,4 +40,4 @@ export function useContainerSize(ref) {
   }, [ref]);
 
   return size;
-}
+};
