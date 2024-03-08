@@ -1,22 +1,15 @@
 "use client";
+import { Dispatch, SetStateAction, useState } from "react";
+import { Blobs, SunBurst, Explore, Explore2, Evolution, WorldEvolution, Intro, BarChart } from "../components/charts";
+import { sunburst_data } from "@/data/sunburst";
 
-import { useState } from "react";
-
-import Blobs from "./charts/bubbles";
-import SunBurst from "./charts/sunburst";
-import { sunburst_data } from "./data/sunburst";
-
-import Intro from "./charts/intro";
-import Explore from "./charts/exploration";
-import Explore2 from "./charts/exploration2";
-import { MyContextProvider } from "./data_context";
-import Evolution from "./charts/evolution";
-import WorldEvolution from "./charts/world";
+import { MyContextProvider } from "@/contexts/data_context";
 import { useRouter } from "next/navigation";
 
-function classNames(...classes) {
+export const classNames = (...classes: (string | boolean | null | undefined)[]): string => {
   return classes.filter(Boolean).join(" ");
-}
+};
+
 
 const tabs = [
   { name: "Introduction", id: "intro" },
@@ -26,9 +19,16 @@ const tabs = [
   { name: "Extra Fun", id: "hemanth" },
   { name: "Makes Over Timer (TBD)", id: "explore" },
   { name: "Mileage vs CO2 (TBD)", id: "explore2" },
+  { name: "Yours", id: "yours" },
 ];
 
-function Navigation({ selectedTab = "intro", setselectedTab }) {
+type NavigationProps = {
+  selectedTab: string;
+  setSelectedTab: Dispatch<SetStateAction<string>>;
+};
+
+export const Navigation: React.FC<NavigationProps> = ({ selectedTab = "intro", setSelectedTab }) => {
+
   return (
     <div>
       <div>
@@ -38,7 +38,7 @@ function Navigation({ selectedTab = "intro", setselectedTab }) {
         >
           {tabs.map((tab, tabIdx) => (
             <button
-              onClick={() => setselectedTab(tab.id)}
+              onClick={() => {console.log(`selected tab: ${tab.id}`); return setSelectedTab(tab.id)}}
               key={tab.id}
               className={classNames(
                 tab.id == selectedTab
@@ -46,13 +46,13 @@ function Navigation({ selectedTab = "intro", setselectedTab }) {
                   : "text-gray-500 hover:text-gray-700 border-gray-100",
                 "m-2 border-2 rounded-lg group relative min-w-0 flex-1 overflow-hidden bg-white py-4 px-4 text-center text-sm font-medium hover:bg-gray-50 focus:z-10"
               )}
-              aria-current={tab.current ? "page" : undefined}
+              aria-current={tab.id ? "page" : undefined}
             >
               <span>{tab.name}</span>
               <span
                 aria-hidden="true"
                 className={classNames(
-                  tab.current ? "bg-indigo-500" : "bg-transparent",
+                  tab.id ? "bg-indigo-500" : "bg-transparent",
                   "absolute inset-x-0 bottom-0 h-0.5"
                 )}
               />
@@ -64,14 +64,18 @@ function Navigation({ selectedTab = "intro", setselectedTab }) {
   );
 }
 
-function SelectedGraph({ selectedTab = "sunburst", router }) {
-  // get router
+type SelectedGraphProps = {
+  selectedTab: string;
+};
 
+export const SelectedGraph: React.FC<SelectedGraphProps> = ({ selectedTab = "sunburst" }) => {
+  const router = useRouter()
   if (selectedTab == "sunburst") {
     return <SunBurst data={sunburst_data} />;
   }
   if (selectedTab == "yours") {
     return (
+      <>
       <Blobs
         data={[
           { r: 5.148585196204891, group: 0 },
@@ -82,6 +86,19 @@ function SelectedGraph({ selectedTab = "sunburst", router }) {
           { r: 10.93892343253752, group: 2 },
         ]}
       />
+
+      <BarChart
+        data={[
+          { year: 2021, sales: 60 },
+          { year:  2028, sales: 26 },
+          { year: 2023, sales: 36 },
+          { year:  2027, sales: 46 },
+          { year:  2026, sales: 16 },
+          { year: 2022, sales: 26 },
+        ]}
+      />
+      
+      </>
     );
   }
   if (selectedTab == "intro") {
@@ -103,12 +120,14 @@ function SelectedGraph({ selectedTab = "sunburst", router }) {
     // redirect to another page with next router
     router.push("/hemanth_charts.html");
   }
+  // if (selectedTab == "hemanth") {
+  //   // redirect to another page with next router
+  //   router.push("/hemanth_charts.html");
+  // }
 }
 
 export default function Home() {
-  const router = useRouter();
-
-  const [selectedTab, setselectedTab] = useState("intro");
+  const [selectedTab, setSelectedTab] = useState<string>("intro");
   return (
     <MyContextProvider>
       <div className="w-full md:w-4/5 m-auto space-y-2 py-16 sm:py-24 min-h-screen">
@@ -118,10 +137,10 @@ export default function Home() {
           </h1>
         </div>
 
-        <Navigation selectedTab={selectedTab} setselectedTab={setselectedTab} />
+        <Navigation selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
 
         <div className="w-full border-2 p-5 rounded-lg">
-          <SelectedGraph selectedTab={selectedTab} router={router} />
+          <SelectedGraph selectedTab={selectedTab} />
         </div>
       </div>
     </MyContextProvider>
