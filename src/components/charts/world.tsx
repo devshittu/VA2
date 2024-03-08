@@ -7,7 +7,7 @@ const top_stats = [
   { name: "XYZ", stat: "24.57%" },
 ];
 
-function WorldEvolution() {
+export const WorldEvolution = () => {
   return (
     <div className="w-full">
       Animation of which countries made the most models over time...
@@ -25,4 +25,4 @@ function WorldEvolution() {
   );
 }
 
-export default WorldEvolution;
+
