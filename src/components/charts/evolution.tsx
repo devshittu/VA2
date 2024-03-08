@@ -1,13 +1,11 @@
-import { useD3 } from "../useD3";
-
-// import {Swatches} from "d3/color-legend"
-// import {howto, altplot} from "d3/example-components"
+import { useD3 } from "@/hooks/useD3";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
-import { useContainerSize } from "../useContainerSize";
-import { MyContext } from "../data_context";
+import { useContainerSize } from "@/hooks/useContainerSize";
+import { MyContext } from "@/contexts/data_context";
+import { DataItem, GroupedData } from "./types";
 
-function Tree(
+export const Tree = (
   data,
   {
     // data is either tabular (array of objects) or hierarchy (nested objects)
@@ -36,11 +34,10 @@ function Tree(
     halo = "#fff", // color of label halo
     haloWidth = 3, // padding around the labels
     curve = d3.curveBumpX, // curve for the link
-
     color_attribute,
     size_attribute,
   } = {}
-) {
+) => {
   // If id and parentId options are specified, or the path option, use d3.stratify
   // to convert tabular data to a hierarchy; otherwise we assume that the data is
   // specified as an object {children} with nested objects (a.k.a. the “flare.json”
@@ -258,7 +255,7 @@ function Tree(
   return svg.node();
 }
 
-function Evolution() {
+export const Evolution = () =>{
   const containerRef = useRef(null);
   const { width, height } = useContainerSize(containerRef);
   const raww = useContext(MyContext);
@@ -267,16 +264,24 @@ function Evolution() {
     "acceleration_0_100_km/h_s"
   );
 
+
   const [selectedSize, setselectedSize] = useState("highway_fuel_per_100km_l");
 
   let makeSelector = null;
   if (raww) {
     // generate options based on the makes in inside raww
-    const makes = new Set(raww.map((d) => d.make));
+    // const makes = new Set(raww.map((d) => d.make));
 
+
+    const makes = new Set(raww.data.map(d => d.make)); // Use raww.data
     makes.add("0-all");
 
-    const data_columns = new Set(raww.columns);
+    console.log("The raw cached: ", raww);
+
+    const data_columns: Set<string> = new Set(raww.columns);
+
+
+    console.log("data_columns:", data_columns)
     // make the react selector
     makeSelector = (
       <div className="grid grid-cols-3 gap-x-5">
@@ -285,6 +290,8 @@ function Evolution() {
             Make
           </label>
           <select
+          name="make"
+          title="make"
             value={selectedMake}
             onChange={(e) => {
               setselectedMake(e.target.value);
@@ -292,9 +299,9 @@ function Evolution() {
           >
             {Array.from(makes)
               .sort()
-              .map((d) => (
-                <option key={d} value={d}>
-                  {d}
+              .map((d, idx) => (
+    <option key={String(d) + idx} value={String(d)}>
+                  {String(d)}
                 </option>
             ))}
           </select>
@@ -305,13 +312,15 @@ function Evolution() {
             Color Attribute
           </label>
           <select
+          name="color"
+          title="color"
             value={selectedColor}
             onChange={(e) => {
               setselectedColor(e.target.value);
             }}
           >
-            {Array.from(data_columns).map((d) => (
-              <option key={d} value={d}>
+            {Array.from(data_columns).map((d, idx) => (
+              <option key={d + ''+ idx} value={d}>
                 {d}
               </option>
             ))}
@@ -323,6 +332,8 @@ function Evolution() {
             Size Attribute
           </label>
           <select
+          name="size"
+          title="size"
             value={selectedSize}
             onChange={(e) => {
               setselectedSize(e.target.value);
@@ -343,20 +354,20 @@ function Evolution() {
     (svg) => {
       svg.selectAll("*").remove();
 
-      if (!raww) return;
+      if (!raww || !Array.isArray(raww.data)) return;
 
       //  filter everything with selectedMake
 
-      let raw = raww;
+      let raw = raww.data;
       if (selectedMake !== "0-all") {
-        raw = raww.filter((d) => d.make === selectedMake);
+        raw = raww.data.filter((d) => d.make === selectedMake);
       }
 
       // get all the column names from raw
 
       const columns = raww.columns;
 
-      let groups = raw.reduce(function (acc, row) {
+      let groups = raw.reduce<GroupedData>(function (acc, row) {
         // Construct the group key
         let key = `${row.make}-${row.model}-${row.generation}-${row.year_from}-${row.year_to}`;
 
@@ -368,7 +379,7 @@ function Evolution() {
         // loop through every column
 
         // Add the row to the group
-        acc[key].push(row); // convert string to number
+        acc[key].push(row as DataItem); // convert string to number
 
         return acc;
       }, {});
@@ -378,7 +389,9 @@ function Evolution() {
         // values contains every row that belongs to the group
         const keys = Object.keys(valuesInit[0]);
         // create a new object with the same keys
-        const obj = {};
+        // const obj = {};
+        const obj: { [key: string]: any } = {};
+
 
         // loop through every key
         for (let i = 0; i < keys.length; i++) {
@@ -408,11 +421,13 @@ function Evolution() {
       }
 
       raw.sort(function (a, b) {
-        return a.year_from - b.year_from;
+        // return a.year_from - b.year_from;
+        return ((a as DataItem).year_from) - ((b as DataItem).year_from);
       });
 
+      
       // get all values in groups
-      let group_values = Object.values(groups).filter((d) => d.year_from);
+      let group_values = Object.values(groups).filter((d) => (d as DataItem).year_from);
 
       if (selectedMake == "0-all") {
         // remove all values where there are less than 3 generations for a model
@@ -530,4 +545,4 @@ function Evolution() {
   );
 }
 
-export default Evolution;
+// src/components/charts/evolution.tsx
