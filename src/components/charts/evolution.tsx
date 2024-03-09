@@ -3,10 +3,10 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 import { useContainerSize } from "@/hooks/useContainerSize";
 import { MyContext } from "@/contexts/data_context";
-import { DataItem, GroupedData } from "./types";
+import { DataItem, GroupedData, TreeVisualizationProps } from "./types";
 
 export const Tree = (
-  data,
+  data: any,
   {
     // data is either tabular (array of objects) or hierarchy (nested objects)
     path, // as an alternative to id and parentId, returns an array identifier, imputing internal nodes
@@ -36,13 +36,14 @@ export const Tree = (
     curve = d3.curveBumpX, // curve for the link
     color_attribute,
     size_attribute,
-  } = {}
+  }: TreeVisualizationProps
 ) => {
   // If id and parentId options are specified, or the path option, use d3.stratify
   // to convert tabular data to a hierarchy; otherwise we assume that the data is
   // specified as an object {children} with nested objects (a.k.a. the “flare.json”
   // format), and use d3.hierarchy.
 
+        console.log('data://: ', data);
   const root =
     path != null
       ? d3.stratify().path(path)(data)
@@ -255,6 +256,8 @@ export const Tree = (
   return svg.node();
 }
 
+
+
 export const Evolution = () =>{
   const containerRef = useRef(null);
   const { width, height } = useContainerSize(containerRef);
@@ -276,12 +279,9 @@ export const Evolution = () =>{
     const makes = new Set(raww.data.map(d => d.make)); // Use raww.data
     makes.add("0-all");
 
-    console.log("The raw cached: ", raww);
 
     const data_columns: Set<string> = new Set(raww.columns);
 
-
-    console.log("data_columns:", data_columns)
     // make the react selector
     makeSelector = (
       <div className="grid grid-cols-3 gap-x-5">
@@ -376,15 +376,20 @@ export const Evolution = () =>{
           acc[key] = [];
         }
 
+
+
         // loop through every column
 
         // Add the row to the group
         acc[key].push(row as DataItem); // convert string to number
 
+
         return acc;
       }, {});
 
       for (let key in groups) {
+
+        let group = groups[key];
         let valuesInit = groups[key];
         // values contains every row that belongs to the group
         const keys = Object.keys(valuesInit[0]);
@@ -420,8 +425,10 @@ export const Evolution = () =>{
         groups[key] = obj;
       }
 
+
+
+
       raw.sort(function (a, b) {
-        // return a.year_from - b.year_from;
         return ((a as DataItem).year_from) - ((b as DataItem).year_from);
       });
 
@@ -443,7 +450,7 @@ export const Evolution = () =>{
             atleast_3.set(d.make + d.model, 1);
           }
         }
-        console.log(group_values);
+        console.log('Group Values', group_values);
         // filter everything where there are less than 3 generations
         group_values = group_values.filter(
           (d) => atleast_3.get(d.make + d.model) >= 10
