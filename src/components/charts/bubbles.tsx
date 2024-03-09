@@ -31,7 +31,6 @@ export const Blobs: React.FC<BlobsProps> = ({ data }) => {
       // const nodes = data.map(Object.create);
       const nodes = data.map(d => ({ ...d }));
 
-      console.log('nodes: ', nodes)
       const simulation = d3
         .forceSimulation<DataItem>(nodes)
         .alphaTarget(0.3)
