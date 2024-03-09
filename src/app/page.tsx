@@ -5,10 +5,8 @@ import { sunburst_data } from "@/data/sunburst";
 
 import { MyContextProvider } from "@/contexts/data_context";
 import { useRouter } from "next/navigation";
+import { classNames } from "@/utils/helpers";
 
-export const classNames = (...classes: (string | boolean | null | undefined)[]): string => {
-  return classes.filter(Boolean).join(" ");
-};
 
 
 const tabs = [
@@ -27,7 +25,7 @@ type NavigationProps = {
   setSelectedTab: Dispatch<SetStateAction<string>>;
 };
 
-export const Navigation: React.FC<NavigationProps> = ({ selectedTab = "intro", setSelectedTab }) => {
+const Navigation: React.FC<NavigationProps> = ({ selectedTab = "intro", setSelectedTab }) => {
 
   return (
     <div>
@@ -68,7 +66,7 @@ type SelectedGraphProps = {
   selectedTab: string;
 };
 
-export const SelectedGraph: React.FC<SelectedGraphProps> = ({ selectedTab = "sunburst" }) => {
+ const SelectedGraph: React.FC<SelectedGraphProps> = ({ selectedTab = "sunburst" }) => {
   const router = useRouter()
   if (selectedTab == "sunburst") {
     return <SunBurst data={sunburst_data} />;
