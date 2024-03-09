@@ -93,6 +93,14 @@ export type DataItem = {
 //   [key: string]: GroupAggregate;
 // };
 
+// export type AggregatedData = {
+//   items: DataItem[];
+//   aggregation: { [key: string]: any }; // Adjust according to the actual structure
+// }
+
+// export type GroupedData = {
+//   [key: string]: AggregatedData;
+// };
 
 // Define the structure of your accumulator object groups
 export type GroupedData = {
