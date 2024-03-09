@@ -45,11 +45,11 @@ export const MyContextProvider: React.FC<MyContextProviderProps> = ({ children }
         await db.table("csvData").put({ data: response, columns: response.columns });
     } else {
         // Adjust based on how you store and retrieve the cached data
-        console.log('Cached data: ',  cachedData)
+        // console.log('Cached data: ',  cachedData)
         dataWithColumns = cachedData[0] as CsvDataWithColumnsType;
     }
 
-    console.log("Context Value Set:", dataWithColumns);
+    // console.log("Context Value Set:", dataWithColumns);
 
     setValue(dataWithColumns);
 };
